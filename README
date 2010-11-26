@@ -1,0 +1,32 @@
+This is a simple script for tagging FLAC files with information supplied from
+discogs.com
+
+The script was forked from this one https://code.google.com/p/jwsandbox/ so the
+licence is strict GPLv2
+
+--------------------------------------------------------------------------------
+usage:
+
+you have a dir(we'll name it "newmusic") with music you want to tag. and a
+folder in which you usually store music(it's name will be "musicroot")
+
+run
+
+py_tag.py -d musicroot/ -a -i newmusic RELEASE_ID
+
+to tag your files. What it will do for you:
+
+  -d --- specifies the directory where to put music after tagging
+  -a --- fetch artist images
+  -i --- fetch release images
+  RELEASE_ID --- the unique number for each music release on Discogs.com
+
+in order to run the script you *must* have an API key from Discogs. In order to
+get it, register on Discogs.com, go to your profile and chose the 'API key' tab
+there, you'll see it. Put the API key into variable in file discogs.py
+
+discogs.py file is for dealing w/ Discogs API
+py_tag.py is for renaming, moving, downloading images, etc
+
+I hope someone finds this one usefull and considers improving it, because I'm
+weak @ Python
