@@ -428,6 +428,14 @@ def make_sortable(istr):
     except AttributeError:
       return istr
 
+def add_Replaygain(filesdir):
+    # add Replay gain
+    if os.system("which metaflac") == 0:
+      print "adding Replaygain..."
+      os.system("metaflac --add-replay-gain \"" + filesdir + "\"/*.flac")
+    else:
+      print "you have no metaflac, no Replaygain added"
+
 
 if __name__ == "__main__":
   usage = "usage: %prog [options] " +\
@@ -606,6 +614,8 @@ if __name__ == "__main__":
                     u"." + ft
     shutil.move(f, nf)
     c += 1
+
+  add_Replaygain(sourceDirname)
 
   # composing new directory name:
   if disc.VArelease == True:
