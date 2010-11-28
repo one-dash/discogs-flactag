@@ -12,7 +12,6 @@ import re
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-API_KEY = ""
 URL = "http://www.discogs.com/release/$REL_ID$?f=xml&api_key=$API_KEY$"
 
 class ReleaseImg:
@@ -56,7 +55,8 @@ class Artist:
   """
   Describes an artist, fetching information from Discogs db
   """
-  def __init__(self, discogsName):
+  def __init__(self, discogsName, API_KEY):
+    self.API_KEY = API_KEY
     # an artist name on Discogs(primary). i.e. "Klima (4)"
     self.discogsName = discogsName
     print "Artist:", self.discogsName
@@ -94,7 +94,7 @@ class Artist:
     """
     artistUrl = "http://www.discogs.com/artist/" +\
         unicode(self.discogsName.replace(' ', '+')) +\
-        "?f=xml&api_key=" + API_KEY
+        "?f=xml&api_key=" + self.API_KEY
     print "Artist URL:", artistUrl
     return unicode(artistUrl).encode('utf-8')
 
@@ -163,7 +163,7 @@ class TrackArtist:
   """
   Describes a track's artist
   """
-  def __init__(self, releaseArtist, discogsNameLst):
+  def __init__(self, releaseArtist, discogsNameLst, API_KEY):
     # artist name as it is stated on a release. as it should be written to a tag
     # field
     self.artistString = releaseArtist
@@ -174,7 +174,7 @@ class TrackArtist:
     self.artstLst = []
 
     for artistName in self.discogsNameLst:
-      self.artstLst.append(Artist(unicode(artistName)))
+      self.artstLst.append(Artist(unicode(artistName), API_KEY))
 
 
 class Track:
@@ -249,10 +249,11 @@ class Discogs(object):
     jesse @ housejunkie . ca        
     """
 
-    def __init__(self, relId, build = 1):
+    def __init__(self, relId, API_KEY, build = 1):
+        self.API_KEY = API_KEY
         self.relId = relId
         self.url = URL.replace("$REL_ID$", relId, 1)
-        self.url = self.url.replace('$API_KEY$', API_KEY,1)
+        self.url = self.url.replace('$API_KEY$', self.API_KEY, 1)
         self.relxml = self.load_xml()
         self.artist = ''
         self.title = ''
@@ -270,6 +271,7 @@ class Discogs(object):
         self.taggedVarious = self.various_tag()
         self.imglist = []
         self.discogs_data = ''
+
 
         # instanciating Discogs automatically populates all
         # records from the releaseId
@@ -380,7 +382,7 @@ class Discogs(object):
         except IndexError:
             return TrackArtist(self.clean_name(\
                 unicode(self.artist.artistString)),\
-                self.artist.discogsNameLst)
+                self.artist.discogsNameLst, self.API_KEY)
         # a list of names of artists as seen in Discogs db(see commenst about it
         # in TrackArtist class and in Artist classes
         discogsArtstNmeLst = []
@@ -423,7 +425,7 @@ class Discogs(object):
                     artst.getElementsByTagName('name')[0].firstChild.data))
             count += 1
         # construct and return a TrackArtist class instance
-        return TrackArtist(name, discogsArtstNmeLst)
+        return TrackArtist(name, discogsArtstNmeLst, self.API_KEY)
 
     def parse_format(self):
         """

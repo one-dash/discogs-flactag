@@ -29,6 +29,10 @@ ARTIST_DATA_FILENAME = "discogs_artistdata.xml"
 # supported file types.
 FILE_TYPE = ['.mp3', '.flac', '.ogg']
 
+def getAPIKey():
+  f = open(os.path.expanduser('~') + "/.discogs-flactag", "r")
+  return str(f.read()).strip()
+
 def removeEndingSlash(string):
   """
   removes ending slash from a string if it ends with it
@@ -484,7 +488,7 @@ if __name__ == "__main__":
 
   sourceDirname = args[0].decode('utf-8')
   files = prep_files(sourceDirname,0)
-  disc = Discogs(args[1])
+  disc = Discogs(args[1], getAPIKey())
   tot = str(len(disc.track_list))
 
   # ensure length of tracks on disk match length
