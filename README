@@ -23,8 +23,7 @@ to tag your files. What it will do for you:
 
 in order to run the script you *must* have an API key from Discogs. In order to
 get it, register on Discogs.com, log in, go to
-https://www.discogs.com/users/api_key . Put the API key into variable in file
-discogs.py
+https://www.discogs.com/users/api_key . Put your API key into ~/.discogs-flactag
 
 discogs.py file is for dealing w/ Discogs API
 py_tag.py is for renaming, moving, downloading images, etc
