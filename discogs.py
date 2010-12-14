@@ -14,6 +14,20 @@ sys.setdefaultencoding('utf-8')
 
 URL = "http://www.discogs.com/release/$REL_ID$?f=xml&api_key=$API_KEY$"
 
+def req_add_headers(orig_request):
+  """
+  this function just adds some headers to the HTTP request and returns it back
+  """
+  orig_request.add_header('Host', 'www.discogs.com')
+  orig_request.add_header('User-Agent',
+      'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.13) Gecko/20101209 Firefox/3.6.13')
+  orig_request.add_header('Accept',\
+      'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
+  orig_request.add_header('Accept-Encoding', 'gzip,deflate')
+  orig_request.add_header('Accept-Charset', 'UTF-8,*')
+  return orig_request
+
+
 class ReleaseImg:
     """
     Describes an image for a release
@@ -103,7 +117,7 @@ class Artist:
     fetches a copy of discogs xml for further processing
     """
     request = urllib2.Request(self.url)
-    request.add_header('Accept-Encoding', 'gzip')
+    request = req_add_headers(request)
     try:
       response = urllib2.urlopen(request)
       data = response.read()
@@ -296,19 +310,21 @@ class Discogs(object):
         api. See here http://www.discogs.com/help/api for docs.
         """
         print 'request: ' + self.url
+        
         request = urllib2.Request(self.url)
-        request.add_header('Accept-Encoding', 'gzip')
+        request = req_add_headers(request)
         try:
-            response = urllib2.urlopen(request)
-            data = response.read()
-            relxml = minidom.parseString(gzip.GzipFile(fileobj = \
-                         cStringIO.StringIO(data)).read())
+          response = urllib2.urlopen(request)
+          data = response.read()
+          relxml = minidom.parseString(gzip.GzipFile(fileobj = \
+                           cStringIO.StringIO(data)).read())
         except Exception:
           try:
             # retrying to get the XML, but treating the result as plain text,
             # not gzipped
             response = urllib2.urlopen(request)
             data = response.read()
+            sys.stdout.write(data)
             relxml = minidom.parseString(data)
           except Exception:
             sys.stderr.write("err: unable to obtain Discogs release : %s\n"\
