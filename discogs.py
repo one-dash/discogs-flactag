@@ -324,7 +324,6 @@ class Discogs(object):
             # not gzipped
             response = urllib2.urlopen(request)
             data = response.read()
-            sys.stdout.write(data)
             relxml = minidom.parseString(data)
           except Exception:
             sys.stderr.write("err: unable to obtain Discogs release : %s\n"\
