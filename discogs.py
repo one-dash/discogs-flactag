@@ -147,7 +147,7 @@ class Artist:
     for anv in anvs.getElementsByTagName('name'):
       anvLst.append(unicode(anv.firstChild.data))
       print "Found ANV:", anvLst[len(anvLst) - 1]
-    
+
     return anvLst
 
   def fillImgsLst(self):
