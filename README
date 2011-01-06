@@ -30,3 +30,6 @@ py_tag.py is for renaming, moving, downloading images, etc
 
 I hope someone finds this one usefull and considers improving it, because I'm
 weak @ Python
+
+
+TODO: configurable filenaming and directory structure
