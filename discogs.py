@@ -335,7 +335,7 @@ class Discogs(object):
       """
       processes Discogs 'join'. e.g ',' -> ', '
       """
-      
+
       subst = {
           "," : ", ",
           "/" : " / ",
