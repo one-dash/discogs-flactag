@@ -33,3 +33,4 @@ weak @ Python
 
 
 TODO: configurable filenaming and directory structure
+TODO: fetch artist XML only once per artist
