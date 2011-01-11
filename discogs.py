@@ -341,7 +341,12 @@ class Discogs(object):
           "/" : " / ",
           "&" : " & ",
           "+" : " + ",
-          "and" : " and "
+          "and" : " and ",
+          "And" : " And ",
+          "ANd" : " ANd ",
+          "AND" : " AND ",
+          "aND" : " aND ",
+          "anD" : " anD "
           }
 
       for a, b in subst.iteritems():
