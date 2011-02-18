@@ -30,7 +30,12 @@ ARTIST_DATA_FILENAME = "discogs_artistdata.xml"
 FILE_TYPE = ['.mp3', '.flac', '.ogg']
 
 def getAPIKey():
-  f = open(os.path.expanduser('~') + "/.discogs-flactag", "r")
+  try:
+    f = open(os.path.expanduser('~') + "/.discogs-flactag", "r")
+  except IOError:
+    sys.stderr.write("there should be ~/.discogs-flactag file readable," +
+        " containing your API key\n")
+    sys.exit(1)
   return str(f.read()).strip()
 
 def removeEndingSlash(string):
