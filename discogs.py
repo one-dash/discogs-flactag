@@ -65,6 +65,10 @@ TYPE_IDX = 3
 
 pseudoArtist = [ "Various", "Unknown Artist" ]
 
+# in this list artists are being cached for further reuse
+# TODO: make it a member of Discogs class and(?) introduce interfaces
+artistCache = []
+
 class Artist:
   """
   Describes an artist, fetching information from Discogs db
@@ -188,7 +192,15 @@ class TrackArtist:
     self.artstLst = []
 
     for artistName in self.discogsNameLst:
-      self.artstLst.append(Artist(unicode(artistName), API_KEY))
+      for artist in artistCache:
+        # assume all artists in artist cache are unique
+        if artist.discogsName == artistName:
+          self.artstLst.append(artist)
+          break
+      else:
+        self.artstLst.append(Artist(unicode(artistName), API_KEY))
+        # append last item from self.artstLst to artist cache
+        artistCache.append(self.artstLst[len(self.artstLst) - 1])
 
 
 class Track:
