@@ -338,7 +338,8 @@ class Discogs(object):
             data = response.read()
             relxml = minidom.parseString(data)
           except Exception:
-            sys.stderr.write("err: unable to obtain Discogs release : %s\n"\
+            sys.stderr.write(("err: unable to obtain Discogs release id%s" +
+                ", wrong API key?\n")
               % self.relId)
             sys.exit(1)
         return relxml

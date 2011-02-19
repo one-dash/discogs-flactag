@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
+import ConfigParser
 import hashlib
-import mutagen 
+import io
+import mutagen
 import mutagen.id3
 import os
 import pdb
@@ -29,14 +31,29 @@ ARTIST_DATA_FILENAME = "discogs_artistdata.xml"
 # supported file types.
 FILE_TYPE = ['.mp3', '.flac', '.ogg']
 
-def getAPIKey():
-  try:
-    f = open(os.path.expanduser('~') + "/.discogs-flactag", "r")
-  except IOError:
-    sys.stderr.write("there should be ~/.discogs-flactag file readable," +
-        " containing your API key\n")
-    sys.exit(1)
-  return str(f.read()).strip()
+class Config:
+  """
+  discribes simple configuration
+  """
+  def __init__(self, filename):
+    """
+    constructor
+
+    filename --- filename(with path) of configuration file
+    """
+    default_settings = """
+[discogs]
+API_KEY: 00000000000
+"""
+    self.cp = ConfigParser.SafeConfigParser()
+    self.cp.readfp(io.BytesIO(default_settings))
+    self.cp.read(filename)
+    self.apiKey = self.cp.get('discogs', 'API_KEY').strip()
+  def getApiKey(self):
+    """
+    returns discogs API key from the config
+    """
+    return self.apiKey
 
 def removeEndingSlash(string):
   """
@@ -501,7 +518,8 @@ if __name__ == "__main__":
 
   sourceDirname = args[0].decode('utf-8')
   files = prep_files(sourceDirname,0)
-  disc = Discogs(args[1], getAPIKey())
+  config = Config(os.path.expanduser('~') + "/.discogs-flactag")
+  disc = Discogs(args[1], config.getApiKey())
   tot = str(len(disc.track_list))
 
   # ensure length of tracks on disk match length
