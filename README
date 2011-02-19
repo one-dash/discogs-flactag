@@ -25,6 +25,10 @@ in order to run the script you *must* have an API key from Discogs. In order to
 get it, register on Discogs.com, log in, go to
 https://www.discogs.com/users/api_key . Put your API key into ~/.discogs-flactag
 
+~/.discogs-flactag config file format:
+[discogs]
+API_KEY: your_API_key
+
 discogs.py file is for dealing w/ Discogs API
 py_tag.py is for renaming, moving, downloading images, etc
 
