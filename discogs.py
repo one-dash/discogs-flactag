@@ -3,11 +3,11 @@
 
 
 from xml.dom import minidom
-import urllib2
-import gzip
 import cStringIO
-import sys
+import gzip
 import re
+import sys
+import urllib2
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
