@@ -14,6 +14,16 @@ sys.setdefaultencoding('utf-8')
 
 URL = "http://www.discogs.com/release/$REL_ID$?f=xml&api_key=$API_KEY$"
 
+def filterThe(title):
+  """
+  transforms artist name from "Kinik, The" to "The Klinik"
+  """
+  try:
+    title = 'The ' + re.search('^(.*)(, The)$', title).group(1)
+    return title
+  except AttributeError:
+    return title
+
 def req_add_headers(orig_request):
   """
   this function just adds some headers to the HTTP request and returns it back
@@ -175,7 +185,7 @@ class Artist:
     TODO
     """
     r = re.compile('\s\(\d+\)')
-    return r.sub('', name)
+    return filterThe(r.sub('', name))
 
 class TrackArtist:
   """
@@ -650,7 +660,7 @@ class Discogs(object):
         Goldie (16)
         """
         r = re.compile('\s\(\d+\)')
-        return r.sub('', name)
+        return filterThe(r.sub('', name))
 
     def clean_year(self, year):
         """'
