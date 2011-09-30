@@ -1,247 +1,22 @@
 #!/usr/bin/python
 # -*- coding: utf_8 -*-
 
-
+from medium import Medium
+from release_img import ReleaseImg
+from track import Track, TYPE_AUDIO, TYPE_DATA, TYPE_VIDEO, TYPE_IDX
+from track_artist import TrackArtist
 from xml.dom import minidom
 import cStringIO
 import gzip
 import re
 import sys
 import urllib2
+import utils
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
 URL = "http://www.discogs.com/release/$REL_ID$?f=xml&api_key=$API_KEY$"
-
-def filterThe(title):
-  """
-  transforms artist name from "Kinik, The" to "The Klinik"
-  """
-  try:
-    title = 'The ' + re.search('^(.*)(, The)$', title).group(1)
-    return title
-  except AttributeError:
-    return title
-
-def req_add_headers(orig_request):
-  """
-  this function just adds some headers to the HTTP request and returns it back
-  """
-  orig_request.add_header('Host', 'www.discogs.com')
-  orig_request.add_header('User-Agent',
-      'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.13) Gecko/20101209 Firefox/3.6.13')
-  orig_request.add_header('Accept',\
-      'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
-  orig_request.add_header('Accept-Encoding', 'gzip,deflate')
-  orig_request.add_header('Accept-Charset', 'UTF-8,*')
-  return orig_request
-
-
-class ReleaseImg:
-    """
-    Describes an image for a release
-    """
-    def __init__(self, uri, type):
-        self.uri = uri
-        self.type = type
-
-class Medium:
-        """
-        Describes a single(or a group of unique) medium(s)
-        """
-        def __init__(self, name, qty = 1, diameter = '', duration = '', \
-          reissue = False):
-            # quantity of the mediums:
-            self.qty = qty
-            # name of the medium: CD, CDr, Vinyl, so on...
-            self.name = name
-            # diameter of the medium: 7", 3", 12", so on...
-            self.diameter = diameter
-            # duration of the medium: LP, EP, Single, so on...
-            self.duration = duration
-            # if this is a reissue
-            self.reissue = reissue
-
-################
-# TRACK TYPES
-# do not reassign this variables, or you'll mess up something
-################
-TYPE_AUDIO = 0
-TYPE_DATA = 1
-TYPE_VIDEO = 2
-TYPE_IDX = 3
-################
-
-pseudoArtist = [ "Various", "Unknown Artist" ]
-
-# in this list artists are being cached for further reuse
-# TODO: make it a member of Discogs class and(?) introduce interfaces
-artistCache = []
-
-class Artist:
-  """
-  Describes an artist, fetching information from Discogs db
-  """
-  def __init__(self, discogsName, API_KEY):
-    self.API_KEY = API_KEY
-    # an artist name on Discogs(primary). i.e. "Klima (4)"
-    self.discogsName = discogsName
-    print "Artist:", self.discogsName
-    self.pseudo = False
-    # if this is a pseudo artist. e.g. 'Various' on Discogs is a pseudo artist
-    for pa in pseudoArtist:
-      if self.discogsName == pa:
-        self.pseudo = True
-        print "is pseudo artist"
-        break
-    # a polished artist primary name
-    self.cleanArtistName = self.polishName(self.discogsName)
-    # all anvs in clean artist name without ending commas
-    self.cleanAnvs = []
-
-    if self.pseudo == False:
-      # a url to artist data
-      self.url = self.constructUrl()
-      # artist XML data
-      self.artstXml = self.loadXml()
-
-      # all artist's name variations are kept here
-      self.anvList = self.fillAnvLst()
-      # here urls to artist's images are kept
-      self.artstImgsLst = self.fillImgsLst()
-
-      # fill the clean anvs list
-      if len(self.anvList) != 0:
-        for anv in self.anvList:
-          self.cleanAnvs.append(self.polishName(anv))
-
-  def constructUrl(self):
-    """
-    contructs a url to artist place in the Discogs db from it's name
-    """
-    artistUrl = "http://www.discogs.com/artist/" +\
-        unicode(self.discogsName.replace(' ', '+')) +\
-        "?f=xml&api_key=" + self.API_KEY
-    print "Artist URL:", artistUrl
-    return unicode(artistUrl).encode('utf-8')
-
-  def loadXml(self):
-    """
-    fetches a copy of discogs xml for further processing
-    """
-    request = urllib2.Request(self.url)
-    request = req_add_headers(request)
-    try:
-      response = urllib2.urlopen(request)
-      data = response.read()
-      axml = minidom.parseString(gzip.GzipFile(fileobj =\
-          cStringIO.StringIO(data)).read())
-    except IOError:
-      axml = minidom.parseString(data)
-    except Exception:
-      sys.stderr.write(u"err: unable to fetch artist \"%s\"" %\
-          self.discogsName.decode('utf-8')\
-          +\
-          u" information from discogs db\n")
-      sys.exit(1)
-    return axml
-
-  def fillAnvLst(self):
-    """
-    returns a list of artist's name variations
-    """
-    try:
-      anvs = self.artstXml.getElementsByTagName('namevariations')[0]
-    except IndexError:
-      # if there are no name variations, return empty list
-      return []
-
-    anvLst = []
-    for anv in anvs.getElementsByTagName('name'):
-      anvLst.append(unicode(anv.firstChild.data))
-      print "Found ANV:", anvLst[len(anvLst) - 1]
-
-    return anvLst
-
-  def fillImgsLst(self):
-    """
-    returns a list of urls to artist images
-    """
-    urlLst = []
-    try:
-      images = self.artstXml.getElementsByTagName('images')[0]
-    except:
-      return urlLst
-
-    for image in images.getElementsByTagName('image'):
-      urlLst.append(unicode(image.getAttribute('uri')))
-      print "Artist image:", urlLst[len(urlLst) - 1]
-
-    return urlLst
-
-  def polishName(self, name):
-    """
-    TODO
-    """
-    r = re.compile('\s\(\d+\)')
-    return filterThe(r.sub('', name))
-
-class TrackArtist:
-  """
-  Describes a track's artist
-  """
-  def __init__(self, releaseArtist, discogsNameLst, API_KEY):
-    # artist name as it is stated on a release. as it should be written to a tag
-    # field
-    self.artistString = releaseArtist
-    # artists names list on discogs(each of artists name is something like
-    # "Klima (4)")
-    self.discogsNameLst = discogsNameLst
-    # here each of artist's information is kept
-    self.artstLst = []
-
-    for artistName in self.discogsNameLst:
-      for artist in artistCache:
-        # assume all artists in artist cache are unique
-        if artist.discogsName == artistName:
-          self.artstLst.append(artist)
-          break
-      else:
-        self.artstLst.append(Artist(unicode(artistName), API_KEY))
-        # append last item from self.artstLst to artist cache
-        artistCache.append(self.artstLst[len(self.artstLst) - 1])
-
-
-class Track:
-  """
-  Describes a single track
-  """
-  def __init__(self, id, artist,\
-      title, position, discNumber, trackType):
-    # track id differs from position, for now it is number in _Discogs_
-    # tracklist, i.e. absolute position in it
-    self.id = id
-    # contains an instance of TrackArtist class
-    self.artist = artist
-    # title of the release
-    self.title = title
-    # track position differs from id. it is the track position on a medium
-    self.position = position
-    # which of the mediums does this track belong to?
-    self.discNumber = discNumber
-    # is this an audio track? (there are data tracks and also video ones...)
-    self.trackType = trackType
-  def isAudio(self):
-    if self.trackType == TYPE_AUDIO:
-      return True
-    else:
-      return False
-  def isIdx(self):
-    if self.trackType == TYPE_IDX:
-      return True
-    else:
-      return False
 
 class Discogs(object):
     """
@@ -271,7 +46,7 @@ class Discogs(object):
 
     >>> for c, a, t in r.track_list:
         ...     print "%d : %s - %s" % (c, a, t)
-        ... 
+        ...
 
     1 : Blunted Dummies - House For All (Original Mix)
     2 : Blunted Dummies - House For All (House 4 All Robots Mix)
@@ -279,10 +54,10 @@ class Discogs(object):
     4 : Blunted Dummies - House For All (J. Acquaviva's Mix)
     5 : Blunted Dummies - House For All (Ruby Fruit Jungle Mix)
 
-    A wrapper script (py_tag.py) is also available, that implements the discogs class for 
+    A wrapper script (py_tag.py) is also available, that implements the discogs class for
     directory/file tagging.
- 
-    jesse @ housejunkie . ca        
+
+    jesse @ housejunkie . ca
     """
 
     def __init__(self, relId, API_KEY, build = 1):
@@ -332,9 +107,9 @@ class Discogs(object):
         api. See here http://www.discogs.com/help/api for docs.
         """
         print 'request: ' + self.url
-        
+
         request = urllib2.Request(self.url)
-        request = req_add_headers(request)
+        request = utils.req_add_headers(request)
         try:
           response = urllib2.urlopen(request)
           data = response.read()
@@ -369,7 +144,8 @@ class Discogs(object):
           "ANd" : " ANd ",
           "AND" : " AND ",
           "aND" : " aND ",
-          "anD" : " anD "
+          "anD" : " anD ",
+          "Feat." : " Feat. "
           }
 
       for a, b in subst.iteritems():
@@ -540,7 +316,7 @@ class Discogs(object):
     def parse_track_list(self):
         """
         returns a list (tlist) of Track objects
-        
+
         """
         tlist = []
         count = 1
@@ -594,7 +370,7 @@ class Discogs(object):
     def parse_genre(self):
         """
         Obtains <genre></genre> within the <genres> tag
-        """        
+        """
         count = 0
         genres = self.relxml.getElementsByTagName('genres')[0]
         for gnr in genres.getElementsByTagName('genre'):
@@ -660,7 +436,7 @@ class Discogs(object):
         Goldie (16)
         """
         r = re.compile('\s\(\d+\)')
-        return filterThe(r.sub('', name))
+        return utils.filterThe(r.sub('', name))
 
     def clean_year(self, year):
         """'
