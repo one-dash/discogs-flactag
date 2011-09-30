@@ -124,7 +124,7 @@ def hashtblFilesInDir(dirPath):
       # adding a hash to table of file hashes
       fileCntnts = open(filePath, "rb").read()
       hList.append(hashlib.sha256(fileCntnts).digest())
-  
+
   return hList
 
 def fetchImg(pathPrefix, uri, newName):
@@ -267,7 +267,7 @@ def ensureAllTracks(tracklist, numberOfFiles):
   ensure that source directory has as many audio files as there are in the track
   list
   """
-  
+
   # number of TRUE tracks, i.e. audio tracks in tracklist
   numTrueTracks = 0
 
@@ -277,7 +277,7 @@ def ensureAllTracks(tracklist, numberOfFiles):
       numTrueTracks += 1
     else:
       pass
-  
+
   if numberOfFiles != numTrueTracks:
     errstr = "err: local tracklist(%s file(s)) does not match discogs " \
           % (numberOfFiles) + \
@@ -442,7 +442,7 @@ def make_sortable(istr):
 
       for now it only makes numbers go like 2 -> 02 or so
     """
-    
+
     istr = unicode(istr).encode("utf-8")
     try:
       return str(re.match("\A(\D+)(\d+)\Z", istr).group(1)) +\
@@ -546,7 +546,7 @@ if __name__ == "__main__":
 
     if disc.track_list[c].discNumber != discnumId:
       discnumber += 1
-      discnumId = disc.track_list[c].discNumber 
+      discnumId = disc.track_list[c].discNumber
     # filetype:
     ft = ""
     if f.endswith(u'.mp3'):
@@ -660,7 +660,7 @@ if __name__ == "__main__":
   prefixDir = composeDestDirName(unicode(sourceDirname).encode("utf-8"))
   if options.destdir != None:
     prefixDir = removeEndingSlash(options.destdir)
-  
+
   artstNmes = []
   # if the user wants artist subdir and anv lymlinks to be created
   if options.crtArtstSbs != None:
@@ -687,7 +687,7 @@ if __name__ == "__main__":
 
   if options.crtArtstSbs != None:
     mkReleaseSymlinks(nd, artstDirs)
-        
+
   # write formatted xml to a file:
   discogs_xml = open(nd + "/" + clean_file(DISCOGS_DATA_FILENAME), "w")
   discogs_xml.write(unicode(disc.discogs_data).encode("utf-8"))
@@ -702,7 +702,7 @@ if __name__ == "__main__":
       gotCover = False
       for image in disc.imglist:
         print "\t", unicode(image.uri).encode("utf-8")
-        
+
         if str(image.type) == 'primary':
           fetchImg(nd, image.uri, 'cover' + '.' +\
               unicode(image.uri.rpartition(".")[2]).encode("utf-8"))

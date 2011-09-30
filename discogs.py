@@ -20,18 +20,18 @@ URL = "http://www.discogs.com/release/$REL_ID$?f=xml&api_key=$API_KEY$"
 
 class Discogs(object):
     """
-    The Discogs class allows you to supply a discogs "release ID", and obtain the 
+    The Discogs class allows you to supply a discogs "release ID", and obtain the
     following attributes .
 
         Album artist  : artist
         Album title   : title
         Release year  : year
-        Record label  : label 
+        Record label  : label
         Cat number    : getCatNo
         Track list    : track_list
 
-    Discogs requires you to obtain your own API key 
-    (see http://www.discogs.com/users/api_key). 
+    Discogs requires you to obtain your own API key
+    (see http://www.discogs.com/users/api_key).
     Please see their API wiki (http://www.discogs.com/help/api) for more information.
     Sample code :
 
@@ -175,7 +175,7 @@ class Discogs(object):
         Exits if data is not present. May want to set a
         default value and remove the sys.exit(), if the
         year isn't a requirement for your needs.
-        """ 
+        """
         try:
             year = unicode(\
                 self.relxml.\
@@ -347,7 +347,7 @@ class Discogs(object):
                             firstChild.data.lower())) and \
                             re.search('(video)', \
                             str(track.getElementsByTagName('position')[0].\
-                            firstChild.data.lower())).group(0) == "video": 
+                            firstChild.data.lower())).group(0) == "video":
                     skipcount += 1
                     print "video track detected at position", \
                         str(count + skipcount)
