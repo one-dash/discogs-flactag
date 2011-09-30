@@ -347,7 +347,7 @@ def form_formatstr(formats):
         formatstr = formatstr + "]"
     return formatstr
 
-def disc_debug(release):
+def releaseSummary(release):
     """
     Debug method to dump all attributes assigned to current Discogs object
     """
@@ -709,5 +709,5 @@ if __name__ == "__main__":
         else:
           fetchImg(nd, image.uri, "")
 
-  print disc_debug(disc)
+  print releaseSummary(disc)
   print "output directory:", nd
