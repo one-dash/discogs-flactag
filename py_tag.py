@@ -460,6 +460,7 @@ def add_Replaygain(filesdir):
 
 
 if __name__ == "__main__":
+
   usage = "usage: %prog [options] " +\
       "<folder of audio files to tag> <discogs release id>"
   optParser = OptionParser(usage)
@@ -510,6 +511,10 @@ if __name__ == "__main__":
   if os.path.isdir(args[0]) == False:
     sys.stderr.write("given argument \"" + args[0] +\
             "\" does not exist or is not a directory\n")
+    sys.exit(1)
+
+  if len(args) < 2:
+    sys.stderr.write("err: you have not supplied Discogs release ID\n")
     sys.exit(1)
 
   if args[1].isdigit() == False:
