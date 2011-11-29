@@ -145,7 +145,8 @@ class Discogs(object):
           "AND" : " AND ",
           "aND" : " aND ",
           "anD" : " anD ",
-          "Feat." : " Feat. "
+          "Feat." : " Feat. ",
+          "Featuring" : " Featuring "
           }
 
       for a, b in subst.iteritems():
