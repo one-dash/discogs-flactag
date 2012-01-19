@@ -11,7 +11,7 @@ class TrackArtist:
   """
   Describes a track's artist
   """
-  def __init__(self, releaseArtist, discogsNameLst, API_KEY):
+  def __init__(self, releaseArtist, discogsNameLst):
     # artist name as it is stated on a release. as it should be written to a tag
     # field
     self.artistString = releaseArtist
@@ -28,7 +28,7 @@ class TrackArtist:
           self.artstLst.append(artist)
           break
       else:
-        self.artstLst.append(Artist(unicode(artistName), API_KEY))
+        self.artstLst.append(Artist(unicode(artistName)))
         # append last item from self.artstLst to artist cache
         artistCache.append(self.artstLst[len(self.artstLst) - 1])
 

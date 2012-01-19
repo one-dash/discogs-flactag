@@ -15,8 +15,7 @@ class Artist:
   """
   Describes an artist, fetching information from Discogs db
   """
-  def __init__(self, discogsName, API_KEY):
-    self.API_KEY = API_KEY
+  def __init__(self, discogsName):
     # an artist name on Discogs(primary). i.e. "Klima (4)"
     self.discogsName = discogsName
     print "Artist:", self.discogsName
@@ -52,9 +51,8 @@ class Artist:
     """
     contructs a url to artist place in the Discogs db from it's name
     """
-    artistUrl = "http://www.discogs.com/artist/" +\
-        unicode(self.discogsName.replace(' ', '+')) +\
-        "?f=xml&api_key=" + self.API_KEY
+    artistUrl = "http://api.discogs.com/artist/" +\
+        unicode(self.discogsName.replace(' ', '+')) + "?f=xml"
     print "Artist URL:", artistUrl
     return unicode(artistUrl).encode('utf-8')
 

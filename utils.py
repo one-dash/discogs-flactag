@@ -16,7 +16,7 @@ def req_add_headers(orig_request):
   """
   this function just adds some headers to the HTTP request and returns it back
   """
-  orig_request.add_header('Host', 'www.discogs.com')
+  orig_request.add_header('Host', 'api.discogs.com')
   orig_request.add_header('User-Agent',
       'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.13) Gecko/20101209 Firefox/3.6.13')
   orig_request.add_header('Accept',\

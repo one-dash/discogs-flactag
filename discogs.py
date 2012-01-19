@@ -16,7 +16,7 @@ import utils
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-URL = "http://www.discogs.com/release/$REL_ID$?f=xml&api_key=$API_KEY$"
+URL = "http://api.discogs.com/release/$REL_ID$?f=xml"
 
 class Discogs(object):
     """
@@ -30,8 +30,6 @@ class Discogs(object):
         Cat number    : getCatNo
         Track list    : track_list
 
-    Discogs requires you to obtain your own API key
-    (see http://www.discogs.com/users/api_key).
     Please see their API wiki (http://www.discogs.com/help/api) for more information.
     Sample code :
 
@@ -60,11 +58,9 @@ class Discogs(object):
     jesse @ housejunkie . ca
     """
 
-    def __init__(self, relId, API_KEY, build = 1):
-        self.API_KEY = API_KEY
+    def __init__(self, relId, build = 1):
         self.relId = relId
         self.url = URL.replace("$REL_ID$", relId, 1)
-        self.url = self.url.replace('$API_KEY$', self.API_KEY, 1)
         self.relxml = self.load_xml()
         self.artist = ''
         self.title = ''
@@ -123,8 +119,7 @@ class Discogs(object):
             data = response.read()
             relxml = minidom.parseString(data)
           except Exception:
-            sys.stderr.write(("err: unable to obtain Discogs release id%s" +
-                ", wrong API key?\n")
+            sys.stderr.write(("err: unable to obtain Discogs release id%s\n")
               % self.relId)
             sys.exit(1)
         return relxml
@@ -205,8 +200,8 @@ class Discogs(object):
             artists = node.getElementsByTagName('artists')[0]
         except IndexError:
             return TrackArtist(self.clean_name(\
-                unicode(self.artist.artistString)),\
-                self.artist.discogsNameLst, self.API_KEY)
+                               unicode(self.artist.artistString)),\
+                               self.artist.discogsNameLst)
         # a list of names of artists as seen in Discogs db(see commenst about it
         # in TrackArtist class and in Artist classes
         discogsArtstNmeLst = []
@@ -249,7 +244,7 @@ class Discogs(object):
                     artst.getElementsByTagName('name')[0].firstChild.data))
             count += 1
         # construct and return a TrackArtist class instance
-        return TrackArtist(name, discogsArtstNmeLst, self.API_KEY)
+        return TrackArtist(name, discogsArtstNmeLst)
 
     def parse_format(self):
         """

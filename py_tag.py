@@ -43,17 +43,10 @@ class Config:
     """
     default_settings = """
 [discogs]
-API_KEY: 00000000000
 """
     self.cp = ConfigParser.SafeConfigParser()
     self.cp.readfp(io.BytesIO(default_settings))
     self.cp.read(filename)
-    self.apiKey = self.cp.get('discogs', 'API_KEY').strip()
-  def getApiKey(self):
-    """
-    returns discogs API key from the config
-    """
-    return self.apiKey
 
 def removeEndingSlash(string):
   """
@@ -368,7 +361,7 @@ def releaseSummary(release):
     r += " Catno : %s\n" % (release.cat_num)
     r += "  Date : %s\n" % (release.date)
     r += "Format : %s\n" % (formatstr)
-    r += "   URL : http:/www.discogs.com/release/%s\n" % (release.relId)
+    r += "   URL : http://www.discogs.com/release/%s\n" % (release.relId)
     r += div
     for i in range(len(release.track_list)):
         if release.track_list[i].isIdx() == True:
@@ -524,7 +517,7 @@ if __name__ == "__main__":
   sourceDirname = args[0].decode('utf-8')
   files = prep_files(sourceDirname,0)
   config = Config(os.path.expanduser('~') + "/.discogs-flactag")
-  disc = Discogs(args[1], config.getApiKey())
+  disc = Discogs(args[1])
   tot = str(len(disc.track_list))
 
   # ensure length of tracks on disk match length
